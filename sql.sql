@@ -77,13 +77,15 @@ insert into EstadoInvitaciones VALUES (1,'pendiende'), (2,'concluida');
 CREATE TABLE IF NOT EXISTS Invitaciones (
     grantor INT,
     grantee INT,
+    tipo_permiso_a_dar INT,
     tipo_invitacion_id INT,
     estado_invitacion_id INT,
     PRIMARY KEY (grantor, grantee),
     FOREIGN KEY (grantor) REFERENCES usuarios(id),
     FOREIGN KEY (grantee) REFERENCES usuarios(id),
     FOREIGN KEY (tipo_invitacion_id) REFERENCES TipoInvitacion(id),
-    FOREIGN KEY (estado_invitacion_id) REFERENCES EstadoInvitaciones(id)
+    FOREIGN KEY (estado_invitacion_id) REFERENCES EstadoInvitaciones(id),
+    FOREIGN KEY (tipo_permiso_a_dar) REFERENCES TipoPermiso(id)
 );
 
 

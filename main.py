@@ -1,5 +1,6 @@
 from database import cursor, conexion
-from menu import crear_nuevo_contacto, mostrar_agenda, buscar_contacto_por_nombre, buscar_contacto_por_telefono
+from menu import (crear_nuevo_contacto, mostrar_agenda, buscar_contacto_por_nombre, buscar_contacto_por_telefono,
+                  borrar_contacto, permisos_agenda_personal, invitar_a_mi_agenda, ver_invitaciones)
 
 
 def menu(current_user):
@@ -10,6 +11,9 @@ def menu(current_user):
         print("4) Buscar Contacto por nombre")
         print("5) Buscar Contacto por telefono")
         print("6) Borrar contacto")
+        print("7) Visibilidad agenda personal")
+        print("8) Invitar a mi agenda")
+        print("9) Ver invitaciones pendientes")
         print("0) Salir")
 
         opcion = input("Seleccione una opción: ")
@@ -26,8 +30,13 @@ def menu(current_user):
         elif opcion == "5":
             buscar_contacto_por_telefono(current_user)
         elif opcion == "6":
-            # Lógica para la opción 6
-            print("Seleccionaste la opción 6: Borrar contacto")
+            borrar_contacto(current_user)
+        elif opcion == "7":
+            permisos_agenda_personal(current_user)
+        elif opcion == "8":
+            invitar_a_mi_agenda(current_user)
+        elif opcion == "9":
+            ver_invitaciones(current_user)
         elif opcion == "0":
             # Salir del bucle si el usuario selecciona la opción 0
             print("Saliendo del programa. Hasta luego!")
@@ -105,8 +114,8 @@ def main():
 
         current_user = 0
         if op_session == "1":
-            current_user = iniciar_sesion()
-            # current_user = 1
+            # current_user = iniciar_sesion()
+            current_user = 2
             break
         elif op_session == "2":
             registrar_usuario()
