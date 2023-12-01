@@ -370,15 +370,27 @@ def ver_invitaciones(current_user):
         respuesta_invitacion = input("¿Desea aceptar (A) o rechazar (R) la invitación?: ").upper()
 
         if respuesta_invitacion == "A":
-            # Aceptar la invitación
-            consulta_aceptar_invitacion = "UPDATE Invitaciones SET estado_invitacion_id = 2 WHERE grantor = %s AND grantee = %s"
-            cursor.execute(consulta_aceptar_invitacion, (grantor, current_user))
+            # Obtener información de la invitación
+            consulta_info_invitacion = "SELECT tipo_permiso_a_dar, tipo_invitacion_id FROM Invitaciones WHERE grantor = %s AND grantee = %s"
+            cursor.execute(consulta_info_invitacion, (grantor, current_user))
+            info_invitacion = cursor.fetchone()
 
-            # aceptar_invitacion(current_user, )
-            
+            if info_invitacion:
+                tipo_permiso_a_dar = info_invitacion[0]
+                tipo_invitacion_id = info_invitacion[1]
 
-            conexion.commit()
-            print("Invitación aceptada.")
+                # Aceptar la invitación
+                consulta_aceptar_invitacion = "UPDATE Invitaciones SET estado_invitacion_id = 2 WHERE grantor = %s AND grantee = %s"
+                cursor.execute(consulta_aceptar_invitacion, (grantor, current_user))
+
+                # Llamar a la función aceptar_invitacion con los valores obtenidos
+                aceptar_invitacion(grantor, current_user, tipo_permiso_a_dar, tipo_invitacion_id)
+
+                conexion.commit()
+                print("Invitación aceptada.")
+            else:
+                print("No se encontró información de la invitación.")
+
         elif respuesta_invitacion == "R":
             # Rechazar la invitación
             consulta_rechazar_invitacion = "UPDATE Invitaciones SET estado_invitacion_id = 2 WHERE grantor = %s AND grantee = %s"
@@ -402,24 +414,27 @@ def grant_permisos(grantor, grantee, tipo_permiso_a_dar):
     print("Permisos personales creados correctamente.")
 
 
-def aceptar_invitacion(current_user, grantor, grantee, tipo_permiso_a_dar, tipo_invitacion_id):
+def aceptar_invitacion(invitador, invitado, tipo_permiso_a_dar, tipo_invitacion_id):
     # Actualizar el estado de la invitación a "concluida"
     consulta_aceptar_invitacion = "UPDATE Invitaciones SET estado_invitacion_id = 2 WHERE grantor = %s AND grantee = %s"
-    cursor.execute(consulta_aceptar_invitacion, (grantor, grantee))
+    cursor.execute(consulta_aceptar_invitacion, (invitador, invitado))
     conexion.commit()
     print("Invitación aceptada.")
 
+    grantor_id = 0
+    grantee_id = 0
+
     # Determinar el grantor y el grantee según el tipo de invitación
     if tipo_invitacion_id == 1:
-        grantor_id = grantor
-        grantee_id = grantee
+        grantor_id = invitador
+        grantee_id = invitado
     elif tipo_invitacion_id == 2:
-        grantor_id = current_user
-        grantee_id = grantor
-    else:
+        grantor_id = invitado
+        grantee_id = invitador
+    # else:
         # Manejar otros tipos de invitaciones según sea necesario
-        grantor_id = current_user
-        grantee_id = grantor
+        # grantor_id = current_user
+        # grantee_id = invitador
 
     # Llamar al método para conceder permisos
     grant_permisos(grantor_id, grantee_id, tipo_permiso_a_dar)
