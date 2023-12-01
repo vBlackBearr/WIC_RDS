@@ -54,10 +54,15 @@ def mostrar_agenda(current_user):
         
         UNION
         
-        SELECT DISTINCT persona.id, persona.Nombre, persona.Telefono, persona.Correo, PermisosPersonales.grantor AS propietario
-        FROM PermisosPersonales
-        JOIN persona ON PermisosPersonales.grantee = persona.id
-        WHERE PermisosPersonales.grantee = %s
+        SELECT DISTINCT persona.id, persona.Nombre, persona.Telefono, persona.Correo, 'Externo' AS propietario
+        FROM AgendaUsuario
+        JOIN persona ON AgendaUsuario.persona_id = persona.id
+        WHERE AgendaUsuario.usuario_id IN (
+            SELECT DISTINCT grantor
+            FROM PermisosPersonales
+            WHERE grantee = %s
+        )   
+
 
 
     """
