@@ -114,8 +114,8 @@ def main():
 
         current_user = 0
         if op_session == "1":
-            # current_user = iniciar_sesion()
-            current_user = 2
+            current_user = iniciar_sesion()
+            # current_user = 2
             break
         elif op_session == "2":
             registrar_usuario()

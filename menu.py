@@ -45,28 +45,40 @@ def crear_nuevo_contacto(current_user_id):
 def mostrar_agenda(current_user):
     print(f"Agenda de Contactos para el Usuario con ID {current_user}:\n")
 
-    # Consulta para obtener los contactos del current_user
+    # Consulta para obtener todos los contactos del current_user y aquellos sobre los que tiene permisos
     consulta_agenda = """
-        SELECT persona.id, persona.Nombre, persona.Telefono, persona.Correo
+        SELECT DISTINCT persona.id, persona.Nombre, persona.Telefono, persona.Correo, 'yo' AS propietario
         FROM AgendaUsuario
         JOIN persona ON AgendaUsuario.persona_id = persona.id
         WHERE AgendaUsuario.usuario_id = %s
+        
+        UNION
+        
+        SELECT DISTINCT persona.id, persona.Nombre, persona.Telefono, persona.Correo, PermisosPersonales.grantor AS propietario
+        FROM PermisosPersonales
+        JOIN persona ON PermisosPersonales.grantee = persona.id
+        WHERE PermisosPersonales.grantee = %s
+
+
     """
 
-    cursor.execute(consulta_agenda, (current_user,))
-    contactos = cursor.fetchall()
+    cursor.execute(consulta_agenda, (current_user, current_user))
+    contactos_combinados = cursor.fetchall()
 
-    if contactos:
+    if contactos_combinados:
         # Imprimir encabezados
-        print("{:<5} {:<20} {:<15} {:<30}".format("ID", "Nombre", "Teléfono", "Correo"))
-        print("-" * 75)
+        print("{:<5} {:<20} {:<15} {:<30} {:<15}".format("ID", "Nombre", "Teléfono", "Correo", "Propietario"))
+        print("-" * 90)
 
         # Imprimir la información de cada contacto
-        for contacto in contactos:
-            id_contacto, nombre, telefono, correo = contacto
-            print("{:<5} {:<20} {:<15} {:<30}".format(id_contacto, nombre, telefono, correo))
+        for contacto in contactos_combinados:
+            id_contacto, nombre, telefono, correo, propietario = contacto
+            print("{:<5} {:<20} {:<15} {:<30} {:<10}".format(id_contacto, nombre, telefono, correo, propietario))
+
     else:
         print("La agenda está vacía.")
+
+
 
 
 # def guardar_contacto():
